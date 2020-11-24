@@ -73,10 +73,10 @@ const light = new THREE.PointLight("white", 2.5, 100);
    
 
   var render = () => {
-    requestAnimationFrame(render);
     if (dTwenty) {
       dTwenty.position.y = 17;
     }
+    requestAnimationFrame(render);
     dTwenty.rotation.y += 0.08;
     dTwenty.rotation.x += 0.03;
     renderer.render(scene, camera);
