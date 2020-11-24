@@ -5,7 +5,6 @@ import * as THREE from 'three';
 
 const scene = new THREE.Scene();
 
-const rotate = .05;
 let dTwenty = null;
 let geometry = null;
 let material = null;
@@ -18,6 +17,8 @@ const camera = new THREE.PerspectiveCamera(
   1000 //far plane
 )
 camera.position.z = 6;
+
+
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setClearColor("black");
 renderer.shadowMap.enabled = true;
@@ -35,12 +36,12 @@ window.addEventListener('resize', () => {
 camera.position.z = 60;
 camera.position.y = 8;
 
+
+
 const loader = new OBJLoader();
 
 loader.load(
-	// resource URL
 	'../dice/d-twenty.obj',
-	// called when resource is loaded
 	function ( object ) {
 
 		scene.add( object );
@@ -70,16 +71,22 @@ const light = new THREE.PointLight("white", 2.5, 100);
     scene.add(light2);
     light2.target = dTwenty;
 
-   
-
   var render = () => {
     if (dTwenty) {
       dTwenty.position.y = 17;
     }
-    requestAnimationFrame(render);
+    
     dTwenty.rotation.y += 0.08;
     dTwenty.rotation.x += 0.03;
     renderer.render(scene, camera);
   }
 
-  render();
+  var animate = () => {
+    requestAnimationFrame(animate);
+    render();
+  }
+
+  animate();
+
+
+  
