@@ -5,7 +5,8 @@ h1 {
   left: 5%;
   padding: .5%;
   z-index: 100;
-  border: 2px solid black;
+  color:  rgb(235, 235, 235);
+  border: 2px solid  rgb(235, 235, 235);
 }
 
 h3 {
@@ -13,6 +14,7 @@ h3 {
   position: absolute;
   left: 16%;
   margin-top: 9%;
+  color:  rgb(235, 235, 235);
 }
 
 #canvas {
@@ -38,7 +40,7 @@ body {
   border-top: 20px solid transparent;
   border-bottom: 20px solid transparent;
   position: relative;
-  border-left: 33px solid black;
+  border-left: 33px solid rgb(235, 235, 235);
   display: block;
 }
 
@@ -51,7 +53,7 @@ body {
 }
 
 .stop {
-  background: black;
+  background:  rgb(235, 235, 235);
   height: 37px;
   width: 37px;
   border: none;

@@ -102,7 +102,7 @@ vn 0 -0.93417 -0.35682
 vn 0 -0.93417 -0.35682
 
 # Faces:
-usemtl Beer
+usemtl Icosahedron Material
 f 1/1/1 2/2/2 3/3/3
 f 3/3/4 4/4/5 1/1/6
 f 3/3/7 5/5/8 6/6/9
