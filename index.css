@@ -1,12 +1,14 @@
 h1 {
   font-family: sans-serif;
   position: absolute;
+  text-align: center;
   top: 20%;
   left: 5%;
   padding: .5%;
   z-index: 100;
   color:  rgb(235, 235, 235);
   border: 2px solid  rgb(235, 235, 235);
+  width: 275px;
 }
 
 h3 {
@@ -50,6 +52,10 @@ body {
   border: none;
   background: none;
   position: absolute;
+}
+
+.play:focus {
+  outline: none;
 }
 
 .stop {
