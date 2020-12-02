@@ -52483,13 +52483,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var three_examples_jsm_loaders_OBJLoader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three/examples/jsm/loaders/OBJLoader */ "./node_modules/three/examples/jsm/loaders/OBJLoader.js");
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 
-// const THREE = require('three')
 
 
+
+// import * as webAudio from 'web-audio-api';
+// var AudioContext = require('web-audio-api').AudioContext;
+
+// const audioContext = new AudioContext;
+// const audioElement = document.querySelector("audio");
+// const track = audioContext.createMediaElementSource(audioElement);
+
+// track.connect(audioContext.destination);
 
 const scene = new three__WEBPACK_IMPORTED_MODULE_1__["Scene"]();
 
-let dTwenty = null;
+let dTwenty = null; // {"rotation": 0, 'y': 0};
 let geometry = null;
 let material = null;
 
@@ -52558,10 +52566,10 @@ const light = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 2.5,
   var render = () => {
     if (dTwenty) {
       dTwenty.position.y = 17;
+      dTwenty.rotation.y += 0.08;
+      dTwenty.rotation.x += 0.03;
     }
     
-    dTwenty.rotation.y += 0.08;
-    dTwenty.rotation.x += 0.03;
     renderer.render(scene, camera);
   }
 
