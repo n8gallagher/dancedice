@@ -2,15 +2,6 @@
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import * as THREE from 'three';
 
-// import * as webAudio from 'web-audio-api';
-// var AudioContext = require('web-audio-api').AudioContext;
-
-// const audioContext = new AudioContext;
-// const audioElement = document.querySelector("audio");
-// const track = audioContext.createMediaElementSource(audioElement);
-
-// track.connect(audioContext.destination);
-
 const scene = new THREE.Scene();
 
 let dTwenty = null; // {"rotation": 0, 'y': 0};

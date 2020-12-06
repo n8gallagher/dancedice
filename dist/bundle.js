@@ -52486,15 +52486,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// import * as webAudio from 'web-audio-api';
-// var AudioContext = require('web-audio-api').AudioContext;
-
-// const audioContext = new AudioContext;
-// const audioElement = document.querySelector("audio");
-// const track = audioContext.createMediaElementSource(audioElement);
-
-// track.connect(audioContext.destination);
-
 const scene = new three__WEBPACK_IMPORTED_MODULE_1__["Scene"]();
 
 let dTwenty = null; // {"rotation": 0, 'y': 0};

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="shortcut icon" href="./favicon.ico">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+  <canvas id="canvas" width="300" height="300"> 
+    An alternative text describing what your canvas displays. 
+  </canvas> 
+  
+  <audio id="audio" controls class="player">
+    <source src="kalimba.ogg" type="audio/ogg">
+  </audio>
+  <script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    console.log(audioCtx)
+    
+    let WIDTH = window.innerWidth;
+    let HEIGHT = window.innerHeight;
+    let canvas = document.getElementById('canvas');
+    let canvasCtx = canvas.getContext('2d');
+    canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+    let audioElement = document.querySelector('audio');
+    let stream = null
+    // create the stream once the playback starts
+    // draw();
+    audioElement.onplay = function() {
+      
+      stream = audioElement.captureStream();
+      console.log(stream)
+      // debugger
+      const audioTracks = stream.getAudioTracks();
+      console.log(audioTracks);
+      track = audioTracks[0];
+      console.log(track);
+      stream.addTrack(track);
+      
+    }
+
+
+    // analyser.connect(audioCtx.destination);
+
+    function draw(stream) {
+      let analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      let bufferLength = analyser.frequencyBinCount;
+      // analyser.connect(stream)
+      let dataArray = new Uint8Array(bufferLength);
+      drawVisual = requestAnimationFrame(draw);
+      analyser.getByteTimeDomainData(dataArray);
+
+      canvasCtx.fillStyle = 'rgb(200, 250, 220)';
+      canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+      canvasCtx.beginPath();
+
+      let sliceWidth = WIDTH * 1.0 / bufferLength;
+      for(var i = 0; i < bufferLength; i++) { 
+      
+        var v = dataArray[i] / 128.0;
+        var y = v * HEIGHT/2;
+
+        if(i === 0) {
+          canvasCtx.moveTo(x, y);
+        } else {
+          canvasCtx.lineTo(x, y);
+        }
+
+        x += sliceWidth;
+      }
+      var x = 0;
+      canvasCtx.lineTo(canvas.width, canvas.height/2);
+      canvasCtx.stroke();
+
+    }
+
+    draw(stream);
+  </script>
+
+  
+</body>
+</html>
