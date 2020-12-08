@@ -52486,6 +52486,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+let dataArray = null;
+
 const scene = new three__WEBPACK_IMPORTED_MODULE_1__["Scene"]();
 
 let dTwenty = null; // {"rotation": 0, 'y': 0};
@@ -52548,19 +52550,40 @@ const light = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 2.5,
   scene.add(light);
   light.target = dTwenty;
 
-  const light2 = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 4.5, 100);
-    light2.position.set(-100, 20, 10);
-    light2.castShadow = true;
-    scene.add(light2);
-    light2.target = dTwenty;
+const light2 = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 4.5, 100);
+  light2.position.set(-100, 20, 10);
+  light2.castShadow = true;
+  scene.add(light2);
+  light2.target = dTwenty;
 
-  var render = () => {
-    if (dTwenty) {
-      dTwenty.position.y = 17;
-      dTwenty.rotation.y += 0.08;
-      dTwenty.rotation.x += 0.03;
-    }
-    
+let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+let analyser = audioCtx.createAnalyser(); //create analyser in ctx
+let audioElement = null
+let src = null;
+let bufferLength = null;
+window.onload = function() {
+
+  audioElement = document.querySelector('audio');
+  // console.log(audioElement);
+  src = audioCtx.createMediaElementSource(audioElement);
+  src.connect(analyser);         //connect analyser node to the src
+  analyser.connect(audioCtx.destination); // connect the destination 
+  analyser.fftSize = 512;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
+  
+}
+
+var render = () => {
+  if (dTwenty) {
+    dTwenty.position.y = 17;
+    dTwenty.rotation.y += 0.08;
+    dTwenty.rotation.x += 0.03;
+  }
+  
+    analyser.getByteTimeDomainData(dataArray);
+    console.log(dataArray);
     renderer.render(scene, camera);
   }
 
