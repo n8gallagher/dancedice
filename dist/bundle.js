@@ -52565,7 +52565,8 @@ let bufferLength = null;
 window.onload = function() {
 
   audioElement = document.querySelector('audio');
-  // console.log(audioElement);
+  // console.log('Audio Context State is ' + audioCtx.state);
+  // console.log(audioCtx);
   src = audioCtx.createMediaElementSource(audioElement);
   src.connect(analyser);         //connect analyser node to the src
   analyser.connect(audioCtx.destination); // connect the destination 
@@ -52573,26 +52574,32 @@ window.onload = function() {
   bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
   
-}
+  var render = () => {
 
-var render = () => {
-  if (dTwenty) {
-    dTwenty.position.y = 17;
-    dTwenty.rotation.y += 0.08;
-    dTwenty.rotation.x += 0.03;
-  }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    
+    if (dTwenty) {
+      dTwenty.position.y = 17;
+      dTwenty.rotation.y += 0.08;
+      dTwenty.rotation.x += 0.03;
+    }
+    
+      analyser.getByteTimeDomainData(dataArray);
+      // console.log(dataArray);
+      renderer.render(scene, camera);
+    }
   
-    analyser.getByteTimeDomainData(dataArray);
-    console.log(dataArray);
-    renderer.render(scene, camera);
+    var animate = () => {
+      requestAnimationFrame(animate);
+      render();
+    }
+
+    animate();
   }
 
-  var animate = () => {
-    requestAnimationFrame(animate);
-    render();
-  }
 
-  animate();
 
 
   
