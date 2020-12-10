@@ -45,26 +45,7 @@ camera.position.y = 12;
 
 const loader = new OBJLoader();
 
-loader.load(
-	'../dice/d-twenty.obj',
-	function ( object ) {
-    material = new THREE.MeshPhongMaterial( {color: "#85210b", shininess: 50} );
-    object.traverse( function ( child ) {
 
-      if ( child instanceof THREE.Mesh ) {
-  
-          child.material = material;
-          child.castShadow = true
-          child.receiveShadow = true
-  
-      }
-  
-  } );
-  scene.add( object );
-  dTwenty = object;
-	}
-
-);
 
 geometry = new THREE.PlaneGeometry(850, 850);
 material = new THREE.MeshPhongMaterial( {color: "#5e4c27", shininess: 50} );
@@ -120,6 +101,26 @@ let audioElement = null
 let src = null;
 let bufferLength = null;
 window.onload = function() {
+  loader.load(
+    '../dice/d-twenty.obj',
+    function ( object ) {
+      material = new THREE.MeshPhongMaterial( {color: "#85210b", shininess: 50} );
+      object.traverse( function ( child ) {
+  
+        if ( child instanceof THREE.Mesh ) {
+    
+            child.material = material;
+            child.castShadow = true
+            child.receiveShadow = true
+    
+        }
+    
+    } );
+    scene.add( object );
+    dTwenty = object;
+    }
+  
+  );
 
   audioElement = document.querySelector('audio');
   // console.log('Audio Context State is ' + audioCtx.state);
