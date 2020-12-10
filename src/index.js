@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 
 let dataArray = null;
-let ADD = .3; // variable for speed of dice
+let ADD = .1; // variable for speed of dice
 let radius = 65; // starting value for circular path radius
 let theta = 0; //variable for the circular path of the dice
 let yVal = 5; // variable for the y axis oscillation of the dice
@@ -78,32 +78,45 @@ floor.receiveShadow = true;
 floor.castShadow = true;
 scene.add(floor);
 
-const ambientLight = new THREE.AmbientLight("white", .125);
 
-scene.add(ambientLight);
 
-const light = new THREE.PointLight("white", 2.5, 60);
-  light.position.set(20, 35, 30)
-  light.castShadow = true;
+
+const ambientLight = new THREE.AmbientLight("white", .2);
+
+const light = new THREE.PointLight("white", 2, 30);
+light.position.set(-70, 50, 80)
+light.castShadow = true;
+
+const light2 = new THREE.PointLight("white", 2, 300);
+light2.position.set(70, 50, 80);
+light2.castShadow = true;
+
+const light3 = new THREE.PointLight("white", 2.5, 300);
+light3.position.set(0, 250, 0);
+light3.castShadow = true;
+
+const addLights = () => {
+
+  
+  scene.add(ambientLight);
+  
   scene.add(light);
   light.target = dTwenty;
 
-const light2 = new THREE.PointLight("white", 2.5, 60);
-  light2.position.set(15, 35, 30);
-  light2.castShadow = true;
   scene.add(light2);
   light2.target = dTwenty;
 
-  const light3 = new THREE.SpotLight("white", 1);
-  light3.position.set(0, 100, 10);
-  light3.angle = Math.PI / 2;
-  light3.penumbra = 0.75;
-  light3.decay = 0;
-  light3.distance = 100;
-  light3.castShadow = true;
   scene.add(light3);
-  
+}
 
+const removeLights = () => {
+  scene.remove(ambientLight);
+  scene.remove(light);
+  scene.remove(light2);
+  scene.remove(light3);
+  // animate();
+}
+  
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 let analyser = audioCtx.createAnalyser(); //create analyser in ctx
@@ -126,6 +139,18 @@ window.onload = function() {
   // console.log(dTwenty);
   // console.log(dTwenty.scale.x);
   
+  audioElement.onplay = function() {
+    addLights();
+  }
+
+  audioElement.addEventListener("pause", removeLights);
+
+  audioElement.onpause = function() {
+    removeLights();
+  }
+
+
+
   var render = () => {
 
     if (audioCtx.state === 'suspended') {
@@ -149,7 +174,7 @@ window.onload = function() {
     
     
       analyser.getByteTimeDomainData(dataArray);
-      // console.log(dataArray);
+      console.log(dataArray);
       renderer.render(scene, camera);
     }
   
@@ -157,7 +182,7 @@ window.onload = function() {
       requestAnimationFrame(animate);
       render();
     }
-
+    
     animate();
   }
 
