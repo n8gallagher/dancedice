@@ -51583,6 +51583,572 @@ if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 /***/ }),
 
+/***/ "./node_modules/three/examples/jsm/loaders/MTLLoader.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/three/examples/jsm/loaders/MTLLoader.js ***!
+  \**************************************************************/
+/*! exports provided: MTLLoader */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MTLLoader", function() { return MTLLoader; });
+/* harmony import */ var _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../build/three.module.js */ "./node_modules/three/build/three.module.js");
+
+/**
+ * Loads a Wavefront .mtl file specifying materials
+ */
+
+var MTLLoader = function ( manager ) {
+
+	_build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["Loader"].call( this, manager );
+
+};
+
+MTLLoader.prototype = Object.assign( Object.create( _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["Loader"].prototype ), {
+
+	constructor: MTLLoader,
+
+	/**
+	 * Loads and parses a MTL asset from a URL.
+	 *
+	 * @param {String} url - URL to the MTL file.
+	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
+	 * @param {Function} [onProgress] - Callback for download progress.
+	 * @param {Function} [onError] - Callback for download errors.
+	 *
+	 * @see setPath setResourcePath
+	 *
+	 * @note In order for relative texture references to resolve correctly
+	 * you must call setResourcePath() explicitly prior to load.
+	 */
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var scope = this;
+
+		var path = ( this.path === '' ) ? _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["LoaderUtils"].extractUrlBase( url ) : this.path;
+
+		var loader = new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["FileLoader"]( this.manager );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.load( url, function ( text ) {
+
+			try {
+
+				onLoad( scope.parse( text, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
+
+		}, onProgress, onError );
+
+	},
+
+	setMaterialOptions: function ( value ) {
+
+		this.materialOptions = value;
+		return this;
+
+	},
+
+	/**
+	 * Parses a MTL file.
+	 *
+	 * @param {String} text - Content of MTL file
+	 * @return {MTLLoader.MaterialCreator}
+	 *
+	 * @see setPath setResourcePath
+	 *
+	 * @note In order for relative texture references to resolve correctly
+	 * you must call setResourcePath() explicitly prior to parse.
+	 */
+	parse: function ( text, path ) {
+
+		var lines = text.split( '\n' );
+		var info = {};
+		var delimiter_pattern = /\s+/;
+		var materialsInfo = {};
+
+		for ( var i = 0; i < lines.length; i ++ ) {
+
+			var line = lines[ i ];
+			line = line.trim();
+
+			if ( line.length === 0 || line.charAt( 0 ) === '#' ) {
+
+				// Blank line or comment ignore
+				continue;
+
+			}
+
+			var pos = line.indexOf( ' ' );
+
+			var key = ( pos >= 0 ) ? line.substring( 0, pos ) : line;
+			key = key.toLowerCase();
+
+			var value = ( pos >= 0 ) ? line.substring( pos + 1 ) : '';
+			value = value.trim();
+
+			if ( key === 'newmtl' ) {
+
+				// New material
+
+				info = { name: value };
+				materialsInfo[ value ] = info;
+
+			} else {
+
+				if ( key === 'ka' || key === 'kd' || key === 'ks' || key === 'ke' ) {
+
+					var ss = value.split( delimiter_pattern, 3 );
+					info[ key ] = [ parseFloat( ss[ 0 ] ), parseFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
+
+				} else {
+
+					info[ key ] = value;
+
+				}
+
+			}
+
+		}
+
+		var materialCreator = new MTLLoader.MaterialCreator( this.resourcePath || path, this.materialOptions );
+		materialCreator.setCrossOrigin( this.crossOrigin );
+		materialCreator.setManager( this.manager );
+		materialCreator.setMaterials( materialsInfo );
+		return materialCreator;
+
+	}
+
+} );
+
+/**
+ * Create a new MTLLoader.MaterialCreator
+ * @param baseUrl - Url relative to which textures are loaded
+ * @param options - Set of options on how to construct the materials
+ *                  side: Which side to apply the material
+ *                        FrontSide (default), THREE.BackSide, THREE.DoubleSide
+ *                  wrap: What type of wrapping to apply for textures
+ *                        RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
+ *                  normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
+ *                                Default: false, assumed to be already normalized
+ *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
+ *                                  Default: false
+ * @constructor
+ */
+
+MTLLoader.MaterialCreator = function ( baseUrl, options ) {
+
+	this.baseUrl = baseUrl || '';
+	this.options = options;
+	this.materialsInfo = {};
+	this.materials = {};
+	this.materialsArray = [];
+	this.nameLookup = {};
+
+	this.side = ( this.options && this.options.side ) ? this.options.side : _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["FrontSide"];
+	this.wrap = ( this.options && this.options.wrap ) ? this.options.wrap : _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+
+};
+
+MTLLoader.MaterialCreator.prototype = {
+
+	constructor: MTLLoader.MaterialCreator,
+
+	crossOrigin: 'anonymous',
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+		return this;
+
+	},
+
+	setManager: function ( value ) {
+
+		this.manager = value;
+
+	},
+
+	setMaterials: function ( materialsInfo ) {
+
+		this.materialsInfo = this.convert( materialsInfo );
+		this.materials = {};
+		this.materialsArray = [];
+		this.nameLookup = {};
+
+	},
+
+	convert: function ( materialsInfo ) {
+
+		if ( ! this.options ) return materialsInfo;
+
+		var converted = {};
+
+		for ( var mn in materialsInfo ) {
+
+			// Convert materials info into normalized form based on options
+
+			var mat = materialsInfo[ mn ];
+
+			var covmat = {};
+
+			converted[ mn ] = covmat;
+
+			for ( var prop in mat ) {
+
+				var save = true;
+				var value = mat[ prop ];
+				var lprop = prop.toLowerCase();
+
+				switch ( lprop ) {
+
+					case 'kd':
+					case 'ka':
+					case 'ks':
+
+						// Diffuse color (color under white light) using RGB values
+
+						if ( this.options && this.options.normalizeRGB ) {
+
+							value = [ value[ 0 ] / 255, value[ 1 ] / 255, value[ 2 ] / 255 ];
+
+						}
+
+						if ( this.options && this.options.ignoreZeroRGBs ) {
+
+							if ( value[ 0 ] === 0 && value[ 1 ] === 0 && value[ 2 ] === 0 ) {
+
+								// ignore
+
+								save = false;
+
+							}
+
+						}
+
+						break;
+
+					default:
+
+						break;
+
+				}
+
+				if ( save ) {
+
+					covmat[ lprop ] = value;
+
+				}
+
+			}
+
+		}
+
+		return converted;
+
+	},
+
+	preload: function () {
+
+		for ( var mn in this.materialsInfo ) {
+
+			this.create( mn );
+
+		}
+
+	},
+
+	getIndex: function ( materialName ) {
+
+		return this.nameLookup[ materialName ];
+
+	},
+
+	getAsArray: function () {
+
+		var index = 0;
+
+		for ( var mn in this.materialsInfo ) {
+
+			this.materialsArray[ index ] = this.create( mn );
+			this.nameLookup[ mn ] = index;
+			index ++;
+
+		}
+
+		return this.materialsArray;
+
+	},
+
+	create: function ( materialName ) {
+
+		if ( this.materials[ materialName ] === undefined ) {
+
+			this.createMaterial_( materialName );
+
+		}
+
+		return this.materials[ materialName ];
+
+	},
+
+	createMaterial_: function ( materialName ) {
+
+		// Create material
+
+		var scope = this;
+		var mat = this.materialsInfo[ materialName ];
+		var params = {
+
+			name: materialName,
+			side: this.side
+
+		};
+
+		function resolveURL( baseUrl, url ) {
+
+			if ( typeof url !== 'string' || url === '' )
+				return '';
+
+			// Absolute URL
+			if ( /^https?:\/\//i.test( url ) ) return url;
+
+			return baseUrl + url;
+
+		}
+
+		function setMapForType( mapType, value ) {
+
+			if ( params[ mapType ] ) return; // Keep the first encountered texture
+
+			var texParams = scope.getTextureParams( value, params );
+			var map = scope.loadTexture( resolveURL( scope.baseUrl, texParams.url ) );
+
+			map.repeat.copy( texParams.scale );
+			map.offset.copy( texParams.offset );
+
+			map.wrapS = scope.wrap;
+			map.wrapT = scope.wrap;
+
+			params[ mapType ] = map;
+
+		}
+
+		for ( var prop in mat ) {
+
+			var value = mat[ prop ];
+			var n;
+
+			if ( value === '' ) continue;
+
+			switch ( prop.toLowerCase() ) {
+
+				// Ns is material specular exponent
+
+				case 'kd':
+
+					// Diffuse color (color under white light) using RGB values
+
+					params.color = new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["Color"]().fromArray( value );
+
+					break;
+
+				case 'ks':
+
+					// Specular color (color when light is reflected from shiny surface) using RGB values
+					params.specular = new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["Color"]().fromArray( value );
+
+					break;
+
+				case 'ke':
+
+					// Emissive using RGB values
+					params.emissive = new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["Color"]().fromArray( value );
+
+					break;
+
+				case 'map_kd':
+
+					// Diffuse texture map
+
+					setMapForType( "map", value );
+
+					break;
+
+				case 'map_ks':
+
+					// Specular map
+
+					setMapForType( "specularMap", value );
+
+					break;
+
+				case 'map_ke':
+
+					// Emissive map
+
+					setMapForType( "emissiveMap", value );
+
+					break;
+
+				case 'norm':
+
+					setMapForType( "normalMap", value );
+
+					break;
+
+				case 'map_bump':
+				case 'bump':
+
+					// Bump texture map
+
+					setMapForType( "bumpMap", value );
+
+					break;
+
+				case 'map_d':
+
+					// Alpha map
+
+					setMapForType( "alphaMap", value );
+					params.transparent = true;
+
+					break;
+
+				case 'ns':
+
+					// The specular exponent (defines the focus of the specular highlight)
+					// A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
+
+					params.shininess = parseFloat( value );
+
+					break;
+
+				case 'd':
+					n = parseFloat( value );
+
+					if ( n < 1 ) {
+
+						params.opacity = n;
+						params.transparent = true;
+
+					}
+
+					break;
+
+				case 'tr':
+					n = parseFloat( value );
+
+					if ( this.options && this.options.invertTrProperty ) n = 1 - n;
+
+					if ( n > 0 ) {
+
+						params.opacity = 1 - n;
+						params.transparent = true;
+
+					}
+
+					break;
+
+				default:
+					break;
+
+			}
+
+		}
+
+		this.materials[ materialName ] = new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["MeshPhongMaterial"]( params );
+		return this.materials[ materialName ];
+
+	},
+
+	getTextureParams: function ( value, matParams ) {
+
+		var texParams = {
+
+			scale: new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["Vector2"]( 1, 1 ),
+			offset: new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["Vector2"]( 0, 0 )
+
+		 };
+
+		var items = value.split( /\s+/ );
+		var pos;
+
+		pos = items.indexOf( '-bm' );
+
+		if ( pos >= 0 ) {
+
+			matParams.bumpScale = parseFloat( items[ pos + 1 ] );
+			items.splice( pos, 2 );
+
+		}
+
+		pos = items.indexOf( '-s' );
+
+		if ( pos >= 0 ) {
+
+			texParams.scale.set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ) );
+			items.splice( pos, 4 ); // we expect 3 parameters here!
+
+		}
+
+		pos = items.indexOf( '-o' );
+
+		if ( pos >= 0 ) {
+
+			texParams.offset.set( parseFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ) );
+			items.splice( pos, 4 ); // we expect 3 parameters here!
+
+		}
+
+		texParams.url = items.join( ' ' ).trim();
+		return texParams;
+
+	},
+
+	loadTexture: function ( url, mapping, onLoad, onProgress, onError ) {
+
+		var texture;
+		var manager = ( this.manager !== undefined ) ? this.manager : _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["DefaultLoadingManager"];
+		var loader = manager.getHandler( url );
+
+		if ( loader === null ) {
+
+			loader = new _build_three_module_js__WEBPACK_IMPORTED_MODULE_0__["TextureLoader"]( manager );
+
+		}
+
+		if ( loader.setCrossOrigin ) loader.setCrossOrigin( this.crossOrigin );
+		texture = loader.load( url, onLoad, onProgress, onError );
+
+		if ( mapping !== undefined ) texture.mapping = mapping;
+
+		return texture;
+
+	}
+
+};
+
+
+
+
+/***/ }),
+
 /***/ "./node_modules/three/examples/jsm/loaders/OBJLoader.js":
 /*!**************************************************************!*\
   !*** ./node_modules/three/examples/jsm/loaders/OBJLoader.js ***!
@@ -52482,12 +53048,17 @@ var OBJLoader = ( function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var three_examples_jsm_loaders_OBJLoader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three/examples/jsm/loaders/OBJLoader */ "./node_modules/three/examples/jsm/loaders/OBJLoader.js");
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three_examples_jsm_loaders_MTLLoader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three/examples/jsm/loaders/MTLLoader */ "./node_modules/three/examples/jsm/loaders/MTLLoader.js");
+
 
 
 
 
 let dataArray = null;
-
+let ADD = .3; // variable for speed of dice
+let radius = 65; // starting value for circular path radius
+let theta = 0; //variable for the circular path of the dice
+let yVal = 5; // variable for the y axis oscillation of the dice
 const scene = new three__WEBPACK_IMPORTED_MODULE_1__["Scene"]();
 
 let dTwenty = null; // {"rotation": 0, 'y': 0};
@@ -52496,12 +53067,12 @@ let material = null;
 
 
 const camera = new three__WEBPACK_IMPORTED_MODULE_1__["PerspectiveCamera"](
-  75, //field of view
+  90, //field of view
   window.innerWidth/window.innerHeight, //aspect ratio
   0.1, //near plane
-  1000 //far plane
+  2000 //far plane
 )
-camera.position.z = 6;
+
 
 
 const renderer = new three__WEBPACK_IMPORTED_MODULE_1__["WebGLRenderer"]({antialias: true});
@@ -52518,8 +53089,8 @@ window.addEventListener('resize', () => {
   
   camera.updateProjectionMatrix; 
 })
-camera.position.z = 60;
-camera.position.y = 8;
+camera.position.z = 100;
+camera.position.y = 12;
 
 
 
@@ -52528,9 +53099,23 @@ const loader = new three_examples_jsm_loaders_OBJLoader__WEBPACK_IMPORTED_MODULE
 loader.load(
 	'../dice/d-twenty.obj',
 	function ( object ) {
+    material = new three__WEBPACK_IMPORTED_MODULE_1__["MeshPhongMaterial"]( {color: "#85210b", shininess: 50} );
+    object.traverse( function ( child ) {
 
-		scene.add( object );
-    dTwenty = object;
+      if ( child instanceof three__WEBPACK_IMPORTED_MODULE_1__["Mesh"] ) {
+  
+          child.material = material;
+          child.castShadow = true
+          child.receiveShadow = true
+  
+      }
+  
+  } );
+  // object.children[0].castShadow = true;
+  // object.children[0].receiveShadow = true;
+  // console.log(object.children[0].castShadow);
+  scene.add( object );
+  dTwenty = object;
 	}
 
 );
@@ -52541,20 +53126,34 @@ const floor = new three__WEBPACK_IMPORTED_MODULE_1__["Mesh"](geometry, material)
 floor.rotation.x = 4.8;
 floor.position.y = -3;
 floor.receiveShadow = true;
+floor.castShadow = true;
 scene.add(floor);
 
+const ambientLight = new three__WEBPACK_IMPORTED_MODULE_1__["AmbientLight"]("white", .125);
 
-const light = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 2.5, 100);
-  light.position.set(20, 20, 40)
+scene.add(ambientLight);
+
+const light = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 2.5, 60);
+  light.position.set(20, 35, 30)
   light.castShadow = true;
   scene.add(light);
   light.target = dTwenty;
 
-const light2 = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 4.5, 100);
-  light2.position.set(-100, 20, 10);
+const light2 = new three__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("white", 2.5, 60);
+  light2.position.set(15, 35, 30);
   light2.castShadow = true;
   scene.add(light2);
   light2.target = dTwenty;
+
+  const light3 = new three__WEBPACK_IMPORTED_MODULE_1__["SpotLight"]("white", 1);
+  light3.position.set(0, 100, 10);
+  light3.angle = Math.PI / 2;
+  light3.penumbra = 0.75;
+  light3.decay = 0;
+  light3.distance = 100;
+  light3.castShadow = true;
+  scene.add(light3);
+  
 
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -52566,13 +53165,17 @@ window.onload = function() {
 
   audioElement = document.querySelector('audio');
   // console.log('Audio Context State is ' + audioCtx.state);
-  // console.log(audioCtx);
+  // console.log(floor.castShadow);
   src = audioCtx.createMediaElementSource(audioElement);
   src.connect(analyser);         //connect analyser node to the src
   analyser.connect(audioCtx.destination); // connect the destination 
   analyser.fftSize = 512;
   bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
+  dTwenty.position.y = 12;
+  dTwenty.position.z = 0;
+  // console.log(dTwenty);
+  // console.log(dTwenty.scale.x);
   
   var render = () => {
 
@@ -52580,11 +53183,21 @@ window.onload = function() {
       audioCtx.resume();
     }
     
-    if (dTwenty) {
-      dTwenty.position.y = 17;
+    
       dTwenty.rotation.y += 0.08;
-      dTwenty.rotation.x += 0.03;
-    }
+      dTwenty.position.x = radius * Math.sin(theta);
+      dTwenty.position.z = radius * Math.cos(theta);
+      dTwenty.position.y += yVal;
+
+      if (dTwenty.position.y > 40 ) {
+         yVal = -yVal;
+      } else if (dTwenty.position.y < 3) {
+       yVal = -yVal;
+      }
+
+
+      theta += ADD;
+    
     
       analyser.getByteTimeDomainData(dataArray);
       // console.log(dataArray);
