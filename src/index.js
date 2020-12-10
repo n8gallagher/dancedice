@@ -38,7 +38,7 @@ window.addEventListener('resize', () => {
   
   camera.updateProjectionMatrix; 
 })
-camera.position.z = 100;
+camera.position.z = 200;
 camera.position.y = 12;
 
 
@@ -60,9 +60,6 @@ loader.load(
       }
   
   } );
-  // object.children[0].castShadow = true;
-  // object.children[0].receiveShadow = true;
-  // console.log(object.children[0].castShadow);
   scene.add( object );
   dTwenty = object;
 	}
@@ -114,7 +111,6 @@ const removeLights = () => {
   scene.remove(light);
   scene.remove(light2);
   scene.remove(light3);
-  // animate();
 }
   
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -132,7 +128,7 @@ window.onload = function() {
   src.connect(analyser);         //connect analyser node to the src
   analyser.connect(audioCtx.destination); // connect the destination 
   analyser.fftSize = 512;
-  bufferLength = analyser.frequencyBinCount;
+  bufferLength = analyser.frequencyBinCount; // 256
   dataArray = new Uint8Array(bufferLength);
   dTwenty.position.y = 12;
   dTwenty.position.z = 0;
@@ -148,6 +144,22 @@ window.onload = function() {
   audioElement.onpause = function() {
     removeLights();
   }
+
+  // const getLowEnd = () => {
+  //   const quarter = dataArray / 4;
+  //   let total = 0
+  //   for (let i = 0; i < quarter; i++) { // attempting to average the low end value of the audio
+  //     // to  set the value of the radius of the path of the dice
+  //     eleInDataArray = dataArray[i]
+  //     console.log(eleInDataArray);
+  //     total += eleInDataArray 
+  //   }
+  //   let lowEnd = total / quarter ;
+  //   console.log(total)
+  //   return lowEnd
+  // }
+
+  
 
 
 
@@ -171,15 +183,50 @@ window.onload = function() {
 
 
       theta += ADD;
-    
+      // camera.position.z = theta;
+      // setTimeout(function(){radius = dataArray[0];}, 500)
+      // radius = dataArray[0];
+      // console.log(getLowEnd())
     
       analyser.getByteTimeDomainData(dataArray);
-      console.log(dataArray);
+      // const quarter = dataArray / 4;
+      // let total = 0
+      // for (let i = 0; i < quarter; i++) { // attempting to average the low end value of the audio
+      //                                     // to  set the value of the radius of the path of the dice
+      //   eleInDataArray = dataArray[i]
+      //   console.log(eleInDataArray);
+      //   total += eleInDataArray
+      // }
+      // let lowEnd = total / quarter ;
+      // console.log(lowEnd);
+      
+      
+      
       renderer.render(scene, camera);
     }
-  
+    
     var animate = () => {
       requestAnimationFrame(animate);
+      let WIDTH = window.innerWidth
+      var sliceWidth = WIDTH * 1.0 / bufferLength;
+      var x = 0;
+      // console.log(dataArray);
+      // for(var i = 0; i < bufferLength; i++) {
+   
+      //   var plotPointAudioData = dataArray[i] / 128.0; // will check all values in dataArray
+        
+  
+      //   if(i === 0) {
+      //     radius = 65;
+      //   } else {
+      //     radius = plotPointAudioData;
+          
+      //   }
+  
+      //   x += sliceWidth;
+      // }
+      
+      
       render();
     }
     
