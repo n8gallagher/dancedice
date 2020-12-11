@@ -53053,6 +53053,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const dTwentyPath = '../dice/d-twenty.obj';
 
 let dataArray = null;
 let ADD = .1; // variable for speed of dice
@@ -53097,8 +53098,8 @@ camera.position.y = 12;
 const loader = new three_examples_jsm_loaders_OBJLoader__WEBPACK_IMPORTED_MODULE_0__["OBJLoader"]();
 
 loader.load(
-	'../dice/d-twenty.obj',
-	function ( object ) {
+  dTwentyPath,
+  function ( object ) {
     material = new three__WEBPACK_IMPORTED_MODULE_1__["MeshPhongMaterial"]( {color: "#85210b", shininess: 50} );
     object.traverse( function ( child ) {
 
@@ -53113,7 +53114,7 @@ loader.load(
   } );
   scene.add( object );
   dTwenty = object;
-	}
+  }
 
 );
 
@@ -53171,6 +53172,7 @@ let audioElement = null
 let src = null;
 let bufferLength = null;
 window.onload = function() {
+  
 
   audioElement = document.querySelector('audio');
   // console.log('Audio Context State is ' + audioCtx.state);
