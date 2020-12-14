@@ -2,18 +2,21 @@
   "name": "dancedice",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --watch --mode=development"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/n8gallagher/dancedice.git"
   },
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/n8gallagher/dancedice/issues"
+  },
+  "homepage": "https://github.com/n8gallagher/dancedice#readme",
   "dependencies": {
-    "express": "^4.17.1",
-    "three": "^0.120.1",
-    "three-obj-loader": "^1.1.3",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "express": "^4.17.1"
   }
 }
