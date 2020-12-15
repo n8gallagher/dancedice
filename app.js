@@ -16,8 +16,6 @@ app.use(express.static(path.join(__dirname, )));
 //   res.sendFile(path.resolve(__dirname, 'dice/d-twenty.obj'));
 // })
 
-
-
 app.listen(port, () => {
   console.log(`DanceDice listening on port ${port}!`)
 })
