@@ -8,7 +8,26 @@ h1 {
   z-index: 100;
   color:  rgb(235, 235, 235);
   border: 2px solid  rgb(235, 235, 235);
-  width: 275px;
+  width: 300px;
+  box-sizing: border-box;
+}
+
+.player-info {
+  top: 135px;
+  left: 5%;
+  width: 200px;
+  height: 1em;
+  position: absolute;
+  border: 2px solid  rgb(235, 235, 235);
+  display: none;
+}
+
+.player-info p {
+  position: absolute;
+  top: -18px;
+  left: 5px;
+  color: rgb(235, 235, 235);
+  text-align: center;
 }
 
 h3 {
@@ -24,7 +43,7 @@ h3 {
   display: inline;
     outline: 0;
     margin: 0;
-    border: 1px solid #E0E0E0;
+    /* border: 1px solid #E0E0E0; */
 }
 
 .relative {
@@ -76,4 +95,15 @@ body {
 .stop:hover {
   background: rgb(90, 90, 90);
   cursor: pointer;
+}
+
+.player {
+  margin-top: 80px;
+  left: 5%;
+  position: absolute;
+  width: 300;
+}
+
+.player:hover #player-info {
+  display: block;
 }
