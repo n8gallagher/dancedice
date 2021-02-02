@@ -2,7 +2,13 @@
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import * as THREE from 'three';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+
+document.addEventListener('DOMContentLoaded', () => {
+
+ 
+
 const dTwentyPath = '../dice/d-twenty.obj';
+const dTenPath = '../dice/d-ten.obj';
 
 let dataArray = null;
 let ADD = .1; // variable for speed of dice
@@ -11,9 +17,12 @@ let theta = 0; //variable for the circular path of the dice
 let yVal = 5; // variable for the y axis oscillation of the dice
 const scene = new THREE.Scene();
 
-let dTwenty = null; // {"rotation": 0, 'y': 0};
+let dTwenty = null;
+let dTen = null; 
+let isLit = true;
 let geometry = null;
 let material = null;
+
 
 
 const camera = new THREE.PerspectiveCamera(
@@ -46,6 +55,39 @@ camera.position.y = 12;
 
 const loader = new OBJLoader();
 
+const dTwentyClickable = document.getElementById("d-twenty-image");
+
+const handleDTwenty = () => {
+  if (dTwenty.visible){
+    
+    removeDTwenty();
+  } else {
+    addDTwenty();
+  }
+  
+}
+
+loader.load(
+  dTenPath,
+  function ( object ) {
+    material = new THREE.MeshPhongMaterial( {color: "#f5cc16", shininess: 50} );
+    object.traverse( function ( child ) {
+
+      if ( child instanceof THREE.Mesh ) {
+  
+          child.material = material;
+          child.castShadow = true
+          child.receiveShadow = true
+  
+      }
+  
+  } );
+  scene.add( object );
+  dTen = object;
+ 
+  }
+  );
+
 loader.load(
   dTwentyPath,
   function ( object ) {
@@ -63,9 +105,26 @@ loader.load(
   } );
   scene.add( object );
   dTwenty = object;
+  dTwenty.position.y = 12;
+  dTwenty.position.z = 0;
   }
+  );
 
-);
+const addDTwenty = () => {
+  dTwenty.visible = true;
+  
+}
+
+
+const removeDTwenty = () => {
+  dTwenty.visible = false;
+}
+
+
+
+
+dTwentyClickable.addEventListener('click', handleDTwenty);
+
 
 geometry = new THREE.PlaneGeometry(850, 850);
 material = new THREE.MeshPhongMaterial( {color: "#5e4c27", shininess: 50} );
@@ -80,24 +139,35 @@ scene.add(floor);
 
 
 const ambientLight = new THREE.AmbientLight("white", .2);
+scene.add(ambientLight);
 
 const light = new THREE.PointLight("white", 2, 30);
 light.position.set(-70, 50, 80)
 light.castShadow = true;
+scene.add(light);
 
 const light2 = new THREE.PointLight("white", 2, 300);
 light2.position.set(70, 50, 80);
 light2.castShadow = true;
+scene.add(light2);
 
 const light3 = new THREE.PointLight("white", 2.5, 300);
 light3.position.set(0, 250, 0);
 light3.castShadow = true;
+scene.add(light3);
 
-const addLights = () => {
+const light4 = new THREE.PointLight("yellow", 2.5, 300);
+light4.position.set(0, 250, 0);
+light4.castShadow = true;
+scene.add(light4);
+
+addLights();
+
+function addLights() {
 
   
   scene.add(ambientLight);
-  
+
   scene.add(light);
   light.target = dTwenty;
 
@@ -105,9 +175,11 @@ const addLights = () => {
   light2.target = dTwenty;
 
   scene.add(light3);
+
 }
 
-const removeLights = () => {
+function removeLights() {
+  
   scene.remove(ambientLight);
   scene.remove(light);
   scene.remove(light2);
@@ -120,32 +192,24 @@ let analyser = audioCtx.createAnalyser(); //create analyser in ctx
 let audioElement = null
 let src = null;
 let bufferLength = null;
-window.onload = function() {
+
   
 
   audioElement = document.querySelector('audio');
-  // console.log('Audio Context State is ' + audioCtx.state);
-  // console.log(floor.castShadow);
+
   src = audioCtx.createMediaElementSource(audioElement);
   src.connect(analyser);         //connect analyser node to the src
   analyser.connect(audioCtx.destination); // connect the destination 
   analyser.fftSize = 512;
   bufferLength = analyser.frequencyBinCount; // 256
   dataArray = new Uint8Array(bufferLength);
-  dTwenty.position.y = 12;
-  dTwenty.position.z = 0;
-  // console.log(dTwenty);
-  // console.log(dTwenty.scale.x);
   
   audioElement.onplay = function() {
-    addLights();
+    animate();
   }
 
-  audioElement.addEventListener("pause", removeLights);
+  // audioElement.addEventListener("pause", removeLights);
 
-  audioElement.onpause = function() {
-    removeLights();
-  }
 
   // const getLowEnd = () => {
   //   const quarter = dataArray / 4;
@@ -166,22 +230,37 @@ window.onload = function() {
 
 
   var render = () => {
+    
+    // if(dTwenty === null) return;
 
     if (audioCtx.state === 'suspended') {
       audioCtx.resume();
     }
     
+      dTen.rotation.y = 0.058;
+      dTen.position.x = radius * Math.sin(theta); // these 4 lines define the circular motion
+      dTen.position.z = radius * Math.cos(theta);
+      dTen.position.y += yVal;
+      yVal = 5;
     
+
       dTwenty.rotation.y += 0.08;
-      dTwenty.position.x = radius * Math.sin(theta);
+      dTwenty.position.x = radius * Math.sin(theta); // these 4 lines define the circular motion
       dTwenty.position.z = radius * Math.cos(theta);
       dTwenty.position.y += yVal;
+    
 
-      if (dTwenty.position.y > 40 ) {
+      if (dTwenty.position.y > 40 ) { // the animation will reverse direction after hitting the limit
          yVal = -yVal;
       } else if (dTwenty.position.y < 3) {
        yVal = -yVal;
       }
+
+      if (dTen.position.y > 36 ) { // same for D10
+        yVal = -yVal;
+     } else if (dTen.position.y < 3.5) {
+      yVal = -yVal;
+     }
 
 
       theta += ADD;
@@ -209,6 +288,7 @@ window.onload = function() {
     
     var animate = () => {
       requestAnimationFrame(animate);
+      
       let WIDTH = window.innerWidth
       var sliceWidth = WIDTH * 1.0 / bufferLength;
       var x = 0;
@@ -231,9 +311,11 @@ window.onload = function() {
       
       render();
     }
+
+  })
     
-    animate();
-  }
+   
+  
 
 
 

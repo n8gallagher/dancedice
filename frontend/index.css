@@ -12,24 +12,6 @@ h1 {
   box-sizing: border-box;
 }
 
-.player-info {
-  top: 135px;
-  left: 5%;
-  width: 200px;
-  height: 1em;
-  position: absolute;
-  border: 2px solid  rgb(235, 235, 235);
-  display: none;
-}
-
-.player-info p {
-  position: absolute;
-  top: -18px;
-  left: 5px;
-  color: rgb(235, 235, 235);
-  text-align: center;
-}
-
 h3 {
   font-family: sans-serif;
   position: absolute;
@@ -48,6 +30,35 @@ h3 {
 
 .relative {
   position: relative;
+}
+
+button {
+  background: none;
+  outline: none;
+  border: none;
+
+}
+
+button:focus {
+  outline: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.buttons {
+  display: flex;
+}
+
+.d-twenty-button {
+  position: absolute;
+  left: 380px;
+}
+
+#d-twenty-image {
+  width: 55px;
+  height: 55px;
 }
 
 body {
@@ -104,6 +115,3 @@ body {
   width: 300;
 }
 
-.player:hover #player-info {
-  display: block;
-}
